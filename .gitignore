@@ -6,7 +6,6 @@ crash.log
 crash.*.log
 *.tfvars
 !*.tfvars.example
-.terraform.lock.hcl
 
 # Secrets
 .env
