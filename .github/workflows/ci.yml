@@ -1,0 +1,71 @@
+name: Enterprise App CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/terraform-foundation
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: applications/enterprise-app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate Python application
+        run: |
+          python -m py_compile app.py
+
+      - name: Test Flask application
+        run: |
+          python - <<'PY'
+          from app import app
+
+          client = app.test_client()
+
+          response = client.get("/")
+          assert response.status_code == 200
+
+          response = client.get("/health")
+          assert response.status_code == 200
+
+          response = client.get("/ready")
+          assert response.status_code == 200
+
+          response = client.get("/info")
+          assert response.status_code == 200
+
+          print("All application endpoints passed.")
+          PY
+
+      - name: Check application files
+        run: |
+          test -f app.py
+          test -f requirements.txt
+          test -f Dockerfile
+          test -f scripts/health-check.sh
+
+      - name: Check health script
+        run: |
+          test -x scripts/health-check.sh
