@@ -85,3 +85,19 @@ jobs:
           docker build \
             -t enterprise-app:${{ github.sha }} \
             .
+      - name: Test Docker container
+        run: |
+          docker run -d \
+            --name enterprise-app-test \
+            -p 8080:8080 \
+            enterprise-app:${{ github.sha }}
+
+          sleep 5
+
+          curl --fail http://localhost:8080/
+          curl --fail http://localhost:8080/health
+          curl --fail http://localhost:8080/ready
+          curl --fail http://localhost:8080/info
+
+          docker stop enterprise-app-test
+          docker rm enterprise-app-test
