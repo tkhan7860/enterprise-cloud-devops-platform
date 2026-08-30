@@ -90,6 +90,10 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name acrenterpriseclouddev
+
       - name: Build Docker image
         working-directory: applications/enterprise-app
         run: |
