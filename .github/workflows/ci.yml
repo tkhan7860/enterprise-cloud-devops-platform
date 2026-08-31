@@ -116,3 +116,12 @@ jobs:
 
           docker stop enterprise-app-test
           docker rm enterprise-app-test
+
+      - name: Push Docker image to ACR
+        run: |
+          docker tag \
+            enterprise-app:${{ github.sha }} \
+            acrenterpriseclouddev.azurecr.io/enterprise-app:${{ github.sha }}
+
+          docker push \
+            acrenterpriseclouddev.azurecr.io/enterprise-app:${{ github.sha }}
