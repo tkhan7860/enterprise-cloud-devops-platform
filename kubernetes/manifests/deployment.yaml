@@ -22,9 +22,6 @@ spec:
         environment: dev
 
     spec:
-      imagePullSecrets:
-        - name: acr-secret
-
       containers:
         - name: enterprise-app
           image: acrenterpriseclouddev.azurecr.io/enterprise-app:1.1.0

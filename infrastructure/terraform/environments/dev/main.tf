@@ -47,3 +47,20 @@ module "acr" {
     ManagedBy   = "Terraform"
   }
 }
+
+module "aks" {
+  source = "../../modules/aks"
+
+  resource_group_name = azurerm_resource_group.platform.name
+  location            = var.location
+
+  cluster_name = "aks-enterprise-dev"
+  dns_prefix   = "aks-enterprise-dev"
+
+  kubernetes_version = null
+  node_count         = 1
+  vm_size            = "Standard_B2s"
+
+  aks_subnet_id = module.network.aks_subnet_id
+  acr_id        = module.acr.acr_id
+}

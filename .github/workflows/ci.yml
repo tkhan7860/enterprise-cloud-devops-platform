@@ -125,3 +125,55 @@ jobs:
 
           docker push \
             acrenterpriseclouddev.azurecr.io/enterprise-app:${{ github.sha }}
+
+  deploy-dev:
+    name: Deploy to AKS Dev
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set AKS context
+        run: |
+          az aks get-credentials \
+            --resource-group rg-enterprise-devops-dev \
+            --name aks-enterprise-dev \
+            --overwrite-existing
+
+      - name: Verify AKS access
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Deploy application
+        run: |
+          kubectl set image deployment/enterprise-app \
+            enterprise-app=acrenterpriseclouddev.azurecr.io/enterprise-app:${{ github.sha }} \
+            --namespace enterprise-dev
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/enterprise-app \
+            --namespace enterprise-dev \
+            --timeout=180s
+
+      - name: Verify deployment
+        run: |
+          kubectl get deployment enterprise-app \
+            --namespace enterprise-dev
+
+          kubectl get pods \
+            --namespace enterprise-dev

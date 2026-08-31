@@ -47,3 +47,23 @@ output "acr_login_server" {
   description = "Login server of the Azure Container Registry."
   value       = module.acr.acr_login_server
 }
+
+output "aks_id" {
+  description = "ID of the AKS cluster."
+  value       = module.aks.aks_id
+}
+
+output "aks_name" {
+  description = "Name of the AKS cluster."
+  value       = module.aks.aks_name
+}
+
+output "aks_fqdn" {
+  description = "FQDN of the AKS API server."
+  value       = module.aks.aks_fqdn
+}
+
+output "aks_kubelet_identity_object_id" {
+  description = "Object ID of the AKS kubelet managed identity."
+  value       = module.aks.kubelet_identity_object_id
+}
